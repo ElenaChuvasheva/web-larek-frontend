@@ -21,8 +21,10 @@ type IOrder = {
 // модель состояния приложения
 interface IAppStateModel {
     catalog: IItemModel[];
-    shoppingCart: Uuid[];
+    basket: Uuid[];
     order: IOrder | null;
+    orderformErrors: OrderFormErrors;
+    contactformErrors: ContactFormErrors;
 }
 
 type PaymentType = 'online' | 'ondelivery';
@@ -30,16 +32,16 @@ type PaymentType = 'online' | 'ondelivery';
 type Uuid = string;
 
 // данные для отображения товара в корзине
-type IShoppingCartItem = Pick<IItemModel, 'title' | 'price'>
+type IBasketItem = Pick<IItemModel, 'title' | 'price'>
 
 // главная страница
 interface IMainPage {
     cartCounter: number;
-    catalog: HTMLElement[];    
+    catalog: HTMLElement[];
 }
 
 // для отображения корзины
-interface IShoppingCart {
+interface IBasket {
     items: HTMLElement[];
     total: number;
 }
@@ -61,3 +63,7 @@ interface IFormState {
     valid: boolean | null;
     errors: string[];
 }
+
+type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
+
+type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
