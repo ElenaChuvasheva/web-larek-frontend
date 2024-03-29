@@ -47,6 +47,7 @@ interface IShoppingCart {
 // для формы заказа
 interface IOrderForm {
     address: string;
+    payment: PaymentType;
 }
 
 // для формы контактов
