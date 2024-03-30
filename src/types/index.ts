@@ -1,26 +1,22 @@
 // модель товара
-interface IItemModel {
+interface IItem {
     id: string;
     description?: string;
     image: string;
     title: string;
     category: string;
-    price: number;
+    price: number | null;
 }
 
 // данные заказа для отправки на бэкенд
-type IOrder = {
-    payment: PaymentType;
-    email: string;
-    phone: string;
-    address: string,
-    total: number;
-    items: Uuid[];
-}
+interface IOrder extends IOrderForm,  IContactForm {
+    total: number; 
+    items: Uuid[]; 
+} 
 
 // модель состояния приложения
-interface IAppStateModel {
-    catalog: IItemModel[];
+interface IAppState {
+    catalog: IItem[];
     basket: Uuid[];
     order: IOrder | null;
     orderformErrors: OrderFormErrors;
@@ -32,7 +28,7 @@ type PaymentType = 'online' | 'ondelivery';
 type Uuid = string;
 
 // данные для отображения товара в корзине
-type IBasketItem = Pick<IItemModel, 'title' | 'price'>
+type IBasketItem = Pick<IItem, 'title' | 'price'>
 
 // главная страница
 interface IMainPage {
@@ -67,3 +63,15 @@ interface IFormState {
 type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
 
 type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
+
+// ответ сервера в случае удачного оформления заказа
+interface IOrderResult {
+    id: Uuid;
+    total: number;
+}
+
+// ответ сервера для списка объектов
+type ApiListResponse<Type> = {
+    total: number,
+    items: Type[]
+}

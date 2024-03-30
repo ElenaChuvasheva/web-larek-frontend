@@ -13,7 +13,7 @@
 - src/pages/index.html — HTML-файл главной страницы
 - src/types/index.ts — файл с типами
 - src/index.ts — точка входа приложения
-- src/styles/styles.scss — корневой файл стилей
+- src/scss/styles.scss — корневой файл стилей
 - src/utils/constants.ts — файл с константами
 - src/utils/utils.ts — файл с утилитами
 
@@ -51,28 +51,24 @@ yarn build
 
 ```
 // модель товара
-interface IItemModel {
+interface IItem {
     id: string;
     description?: string;
     image: string;
     title: string;
     category: string;
-    price: number;
+    price: number | null;
 }
 
 // данные заказа для отправки на бэкенд
-type IOrder = {
-    payment: PaymentType;
-    email: string;
-    phone: string;
-    address: string,
-    total: number;
-    items: Uuid[];
-}
+interface IOrder extends IOrderForm,  IContactForm {
+    total: number; 
+    items: Uuid[]; 
+} 
 
 // модель состояния приложения
-interface IAppStateModel {
-    catalog: IItemModel[];
+interface IAppState {
+    catalog: IItem[];
     basket: Uuid[];
     order: IOrder | null;
     orderformErrors: OrderFormErrors;
@@ -84,7 +80,7 @@ type PaymentType = 'online' | 'ondelivery';
 type Uuid = string;
 
 // данные для отображения товара в корзине
-type IBasketItem = Pick<IItemModel, 'title' | 'price'>
+type IBasketItem = Pick<IItem, 'title' | 'price'>
 
 // главная страница
 interface IMainPage {
@@ -116,33 +112,48 @@ interface IFormState {
     errors: string[];
 }
 
-// ошибки формы заказа
 type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
 
-// ошибки формы контактов
 type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
+
+// ответ сервера в случае удачного оформления заказа
+interface IOrderResult {
+    id: Uuid;
+    total: number;
+}
+
+// ответ сервера для списка объектов
+type ApiListResponse<Type> = {
+    total: number,
+    items: Type[]
+}
 ```
+
+### Базовый код
+
+#### Класс EventEmitter
+Реализует паттерн «Наблюдатель» и позволяет подписываться на события и уведомлять подписчиков о наступлении события. Класс имеет методы on, off, emit для подписки на событие, отписки от события и уведомления подписчиков о наступлении события соответственно. Дополнительно реализованы методы onAll и offAll для подписки на все события и сброса всех подписчиков,trigger для генерации заданного события с заданными аргументами.
+
+#### Класс Model<T>
+Абстрактный, является базовым для моделей данных. Принимает в переменной T тип данных модели. Содержит события Event Emitter. Имеет метод emitChanges, позволяющий оповестить об изменениях в модели.
+
+#### Класс Component<T>
+Абстрактный, является базовым классом для компонентов интерфейса. Класс является дженериком и принимает в переменной T тип данных, которые могут быть переданы в метод render для отображения. Содержит элемент контейнера и методы управления - переключение класса toggleClass, установка текстового содержимого setText, смена статуса блокировки setDisabled, установка изображения setImage, получение обработанного элемента-контейнера render.
+
+#### Класс Api
+Реализует обмен данными с сервером с помощью методов get и post.
 
 ### Классы
 
 #### Модели данных
 
-##### Класс Model (родительский)
-
-Базовый для остальных моделей. Реализует паттерн Event Emitter. Имеет метод emitChanges, позволяющий оповестить об изменениях в модели.
-
 ##### Класс Item
-
 Содержит данные карточки товара
 
 ##### Класс AppState
-
 Описывает состояние приложения. Хранит данные карточек товара, выводимых на главной странице, состояние заказа, корзины. Содержит методы добавления товара в корзину (addToBasket) и удаления (deleteFromBasket), обновления каталога (setCatalog), получения количества (getNumberBasket) и стоимости товаров (getTotalBasket) в корзине, получения данных выбранного товара по id (getItemById), определения наличия товара в корзине (isInBasket), валидации форм (validateOrderForm, validateContactForm), очистки корзины (clearBasket) и заказа (clearOrder).
 
 #### Компоненты представления
-
-##### Класс Component (родительский)
-Содержит элемент контейнера и методы управления - переключение класса (toggleClass), установка текстового содержимого (setText), смена статуса блокировки (setDisabled), установка изображения (setImage), получение обработанного элемента-контейнера (render).
 
 ##### Класс Page
 Описывает главную страницу. Содежит методы задания значения счётчика корзины (counter) и карточек (catalog).
@@ -153,21 +164,22 @@ type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
 ##### Класс Basket
 Корзина. Содержит сеттеры и геттеры для общей стоимости (total) и списка товаров (items).
 
-##### Класс Form (родительский для всех форм)
-Содержит метод valid, блокирующий или разблокирующий кнопку отправки в зависимости от переданного значения, метод errors - задание текста ошибок формы.
+##### Класс Form<T>
+Базовый для всех форм. Содержит метод valid, блокирующий или разблокирующий кнопку отправки в зависимости от переданного значения, метод errors - задание текста ошибок формы.
 
 ##### Класс OrderForm
-Определяет форму заказа. Содержит поле address.
+Производный от Form. Определяет форму заказа. Содержит поле address.
 
 ##### Класс ContactForm
-Определяет форму контактов. Содержит поля email и phone.
+Производный от Form. Определяет форму контактов. Содержит поля email и phone.
 
 ##### Класс Modal
 Определяет модальное окно. Содержит методы открытия (open) и закрытия (close), сеттер для содержания окна.
 
 #### Взаимодействие с сервером
-##### Класс Api
-Реализует обмен данными с сервером с помощью методов get и post.
+
+##### Класс LarekApi
+Производный от Api. Реализует обмен данными с сервером проекта. Методы getItemList для получения с сервера списка товаров, postOrder для отправки заказа.
 
 ### События
 
