@@ -1,5 +1,5 @@
 // модель товара
-interface IItem {
+export interface IItem {
     id: string;
     description?: string;
     image: string;
@@ -9,13 +9,13 @@ interface IItem {
 }
 
 // данные заказа для отправки на бэкенд
-interface IOrder extends IOrderForm,  IContactForm {
+export interface IOrder extends IOrderForm,  IContactForm {
     total: number; 
     items: Uuid[]; 
 } 
 
 // модель состояния приложения
-interface IAppState {
+export interface IAppState {
     catalog: IItem[];
     basket: Uuid[];
     order: IOrder | null;
@@ -25,13 +25,13 @@ interface IAppState {
 
 type PaymentType = 'online' | 'ondelivery';
 
-type Uuid = string;
+export type Uuid = string;
 
 // данные для отображения товара в корзине
-type IBasketItem = Pick<IItem, 'title' | 'price'>
+export type IBasketItem = Pick<IItem, 'title' | 'price'>
 
 // главная страница
-interface IMainPage {
+export interface IMainPage {
     cartCounter: number;
     catalog: HTMLElement[];
 }
@@ -60,9 +60,9 @@ interface IFormState {
     errors: string[];
 }
 
-type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
+export type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
 
-type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
+export type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
 
 // ответ сервера в случае удачного оформления заказа
 interface IOrderResult {
@@ -71,7 +71,7 @@ interface IOrderResult {
 }
 
 // ответ сервера для списка объектов
-type ApiListResponse<Type> = {
+export type ApiListResponse<Type> = {
     total: number,
     items: Type[]
 }
