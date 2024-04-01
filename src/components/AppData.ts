@@ -24,7 +24,6 @@ export class AppState extends Model<IAppState> {
 
     addBasket(item: IItem) {
         this.basket.push(item.id);
-        console.log(this.basket);
     }
 
     getNumberBasket(): number {

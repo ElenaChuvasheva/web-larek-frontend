@@ -7,39 +7,39 @@ interface ICardActions {
     onClick: (event: MouseEvent) => void;
 }
 
-export class CardForList extends Component<IItem> {
+export class Card extends Component<IItem> {
     protected _title: HTMLElement;
     protected _price: HTMLElement;
-    protected _image: HTMLImageElement;
-    protected _category: HTMLElement;
+    protected _image?: HTMLImageElement;
+    protected _category?: HTMLElement;
+    protected _button?: HTMLButtonElement;
 
-    constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
+    constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
-
         this._title = ensureElement<HTMLElement>(`.card__title`, container);
         this._price = ensureElement<HTMLElement>(`.card__price`, container);
-        this._image = ensureElement<HTMLImageElement>(`.card__image`, container);
-        this._category = ensureElement<HTMLElement>(`.card__category`, container);
-    }
+        this._image = container.querySelector(`.card__image`);
+        this._category = container.querySelector(`.card__category`);
 
+        if (actions?.onClick) {
+            if (this._button) {
+                this._button.addEventListener('click', actions.onClick);
+            } else {
+                container.addEventListener('click', actions.onClick);
+            }
+        }        
+    }
     private getCategoryClass(value: string) {
         const categorySetting = settings[value] || 'unknown';
         return 'card__category_' + categorySetting;
     }
 
-
     set title(value: string) {
         this._title.textContent = value;
-    }
-    get title(): string {
-        return this._title.textContent || '';
     }
 
     set price(value: string) {
         this._price.textContent = value ? value + ' синапсов' : 'Бесценно';
-    }
-    get price(): string {
-        return this._price.textContent;
     }
 
     set image(value: string) {

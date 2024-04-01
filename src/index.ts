@@ -1,12 +1,13 @@
 import './scss/styles.scss';
 
 import { AppState, CatalogChangeEvent } from "./components/AppData";
-import { CardForList } from './components/Card';
+import { Card } from './components/Card';
 import { LarekAPI } from './components/LarekAPI';
 import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
 import { API_URL, CDN_URL } from "./utils/constants";
 import { cloneTemplate, ensureElement } from './utils/utils';
+import { IItem } from './types';
 
 const api = new LarekAPI(CDN_URL, API_URL);
 const events = new EventEmitter();
@@ -15,7 +16,6 @@ const appData = new AppState({}, events);
 const page = new Page(document.body, events);
 
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
-console.log(cardCatalogTemplate);
 
 api.getItemList()
     .then((result) => {appData.setCatalog(result);})
@@ -24,9 +24,8 @@ api.getItemList()
     });
 
 events.on<CatalogChangeEvent>('items:changed', () => {
-    console.log('items changed');
     page.catalog = appData.catalog.map(item => {        
-        const card = new CardForList('card', cloneTemplate(cardCatalogTemplate), {
+        const card = new Card(cloneTemplate(cardCatalogTemplate), {
             onClick: () => events.emit('card:select', item)
         });
         return card.render({
@@ -36,4 +35,8 @@ events.on<CatalogChangeEvent>('items:changed', () => {
             category: item.category
         });
     });
+});
+
+events.on('card:select', (item: IItem) => {
+    console.log('hello from card:select', item);
 });
