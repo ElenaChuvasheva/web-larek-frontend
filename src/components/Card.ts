@@ -20,6 +20,7 @@ export class Card extends Component<IItem> {
         this._price = ensureElement<HTMLElement>(`.card__price`, container);
         this._image = container.querySelector(`.card__image`);
         this._category = container.querySelector(`.card__category`);
+        this._button = container.querySelector('.card__button');
 
         if (actions?.onClick) {
             if (this._button) {
