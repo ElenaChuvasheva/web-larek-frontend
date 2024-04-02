@@ -18,6 +18,7 @@ const page = new Page(document.body, events);
 
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
@@ -76,4 +77,8 @@ events.on('modal:open', () => {
 
 events.on('modal:close', () => {
     page.locked = false;
+});
+
+events.on('basket:open', () => {
+
 });

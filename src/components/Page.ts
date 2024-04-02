@@ -7,6 +7,7 @@ export class Page extends Component<IMainPage> {
     protected _counter: HTMLElement;
     protected _catalog: HTMLElement;
     protected _wrapper: HTMLElement;
+    protected _basket: HTMLButtonElement;
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
@@ -14,6 +15,9 @@ export class Page extends Component<IMainPage> {
         this._catalog = ensureElement<HTMLElement>('.gallery');
         this._counter = ensureElement<HTMLElement>('.header__basket-counter');
         this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
+        this._basket = ensureElement<HTMLButtonElement>('.header__basket');
+        
+        this._basket.addEventListener('click', () => { this.events.emit('basket:open'); });
     }
 
     set catalog(items: HTMLElement[]) {
