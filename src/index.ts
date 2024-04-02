@@ -9,6 +9,8 @@ import { Modal } from './components/common/Modal';
 import { IItem } from './types';
 import { API_URL, CDN_URL } from "./utils/constants";
 import { cloneTemplate, ensureElement } from './utils/utils';
+import { Basket } from './components/common/Basket';
+import { priceString } from './utils/utils';
 
 const api = new LarekAPI(CDN_URL, API_URL);
 const events = new EventEmitter();
@@ -22,6 +24,7 @@ const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
+const basket = new Basket(cloneTemplate(basketTemplate), events);
 
 api.getItemList()
     .then((result) => {appData.setCatalog(result);})
@@ -80,5 +83,5 @@ events.on('modal:close', () => {
 });
 
 events.on('basket:open', () => {
-
+    modal.render({content: basket.render({total: priceString(appData.getTotalBasket())})});
 });

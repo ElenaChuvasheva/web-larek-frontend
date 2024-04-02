@@ -133,3 +133,7 @@ export function createElement<
     }
     return element;
 }
+
+export function priceString(value: number | null) {
+    return Number.isInteger(value) ? value + ' синапсов' : 'Бесценно'
+}

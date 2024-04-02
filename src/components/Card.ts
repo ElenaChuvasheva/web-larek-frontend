@@ -2,6 +2,7 @@ import { IItem } from "../types";
 import { settings } from "../utils/constants";
 import { ensureElement } from "../utils/utils";
 import { Component } from "./base/Component";
+import { priceString } from "../utils/utils";
 
 interface ICardActions {
     onClick: (event: MouseEvent) => void;
@@ -42,8 +43,8 @@ export class Card extends Component<IItem> {
     }
 
     // просто заблокировать? если нет, то при пересчёте заказа следить, чтобы не отправить пустой
-    set price(value: string) {
-        this._price.textContent = value ? value + ' синапсов' : 'Бесценно';
+    set price(value: number | null) {
+        this._price.textContent = priceString(value);
     }
 
     set image(value: string) {

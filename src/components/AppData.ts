@@ -1,4 +1,4 @@
-import { ContactFormErrors, IAppState, IItem, IOrder, OrderFormErrors, Uuid } from "../types";
+import { ContactFormErrors, IAppState, IItem, IOrder, OrderFormErrors } from "../types";
 import { Model } from "./base/Model";
 
 export class Item extends Model<IItem> {
@@ -11,8 +11,8 @@ export class Item extends Model<IItem> {
 }
 
 export class AppState extends Model<IAppState> {
-    catalog: Item[] = [];
-    basket: Uuid[] = [];
+    catalog: IItem[] = [];
+    basket: IItem[] = [];
     order: IOrder | null = null;
     orderformErrors: OrderFormErrors = {};
     contactformErrors: ContactFormErrors = {};
@@ -23,23 +23,26 @@ export class AppState extends Model<IAppState> {
     }
 
     addBasket(item: IItem) {
-        this.basket.push(item.id);
+        this.basket.push(item);
         this.emitChanges('basket:changed');
     }
 
     removeBasket(item: IItem) {
-        this.basket = this.basket.filter((uuid) => uuid !== item.id);
+        this.basket = this.basket.filter((basketItem) => basketItem.id !== item.id);
         this.emitChanges('basket:changed');
     }
 
     isInBasket(item: IItem) {
-        return this.basket.some((uuid) => {return uuid === item.id;});
+        return this.basket.some((basketItem) => {return basketItem.id === item.id;});
     }
 
     getNumberBasket(): number {
         return this.basket.length;
     }
 
+    getTotalBasket(): number {
+        return this.basket.reduce((a, b) => {return a + (b.price ? b.price : 0);}, 0);
+    }
 }
 
 export type CatalogChangeEvent = {
