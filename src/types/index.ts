@@ -1,7 +1,7 @@
 // модель товара
 export interface IItem {
     id: string;
-    description?: string;
+    description: string;
     image: string;
     title: string;
     category: string;

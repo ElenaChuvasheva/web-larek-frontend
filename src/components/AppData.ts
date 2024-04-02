@@ -24,11 +24,22 @@ export class AppState extends Model<IAppState> {
 
     addBasket(item: IItem) {
         this.basket.push(item.id);
+        this.emitChanges('basket:changed');
+    }
+
+    removeBasket(item: IItem) {
+        this.basket = this.basket.filter((uuid) => uuid !== item.id);
+        this.emitChanges('basket:changed');
+    }
+
+    isInBasket(item: IItem) {
+        return this.basket.some((uuid) => {return uuid === item.id;});
     }
 
     getNumberBasket(): number {
         return this.basket.length;
     }
+
 }
 
 export type CatalogChangeEvent = {

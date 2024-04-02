@@ -13,6 +13,7 @@ export class Card extends Component<IItem> {
     protected _image?: HTMLImageElement;
     protected _category?: HTMLElement;
     protected _button?: HTMLButtonElement;
+    protected _description?: HTMLElement;
 
     constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
@@ -21,6 +22,7 @@ export class Card extends Component<IItem> {
         this._image = container.querySelector(`.card__image`);
         this._category = container.querySelector(`.card__category`);
         this._button = container.querySelector('.card__button');
+        this._description = container.querySelector('.card__text');
 
         if (actions?.onClick) {
             if (this._button) {
@@ -39,6 +41,7 @@ export class Card extends Component<IItem> {
         this._title.textContent = value;
     }
 
+    // просто заблокировать? если нет, то при пересчёте заказа следить, чтобы не отправить пустой
     set price(value: string) {
         this._price.textContent = value ? value + ' синапсов' : 'Бесценно';
     }
@@ -51,5 +54,13 @@ export class Card extends Component<IItem> {
         this._category.textContent = value;
         const backgroundColorClass = this.getCategoryClass(value);
         this._category.classList.add(backgroundColorClass);
+    }
+
+    set description(value: string) {
+        this._description.textContent = value;
+    }
+
+    set inBasket(isInBasket: boolean) {
+        this._button.textContent = isInBasket ? 'Убрать' : 'В корзину';
     }
 }
