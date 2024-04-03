@@ -12,8 +12,10 @@ export interface ICard extends IItem {
     index?: number;
 }
 
+export interface IAnyForm extends IOrderForm,  IContactsForm {};
+
 // данные заказа для отправки на бэкенд
-export interface IOrder extends IOrderForm,  IContactForm {
+export interface IOrder extends IAnyForm {
     total: number; 
     items: Uuid[]; 
 } 
@@ -22,12 +24,12 @@ export interface IOrder extends IOrderForm,  IContactForm {
 export interface IAppState {
     catalog: IItem[];
     basket: IItem[];
-    order: IOrder | null;
-    orderformErrors: OrderFormErrors;
-    contactformErrors: ContactFormErrors;
+    order: IOrder;
+    orderFormErrors: OrderFormErrors;
+    contactsFormErrors: ContactsFormErrors;
 }
 
-type PaymentType = 'online' | 'ondelivery';
+export type PaymentType = string;
 
 export type Uuid = string;
 
@@ -40,33 +42,21 @@ export interface IMainPage {
     catalog: HTMLElement[];
 }
 
-// для отображения корзины
-interface IBasket {
-    items: HTMLElement[];
-    total: number;
-}
-
 // для формы заказа
-interface IOrderForm {
+export interface IOrderForm {
     address: string;
     payment: PaymentType;
 }
 
 // для формы контактов
-interface IContactForm {
+export interface IContactsForm {
     email: string;
     phone: string;
 }
 
-// состояние формы
-interface IFormState {
-    valid: boolean | null;
-    errors: string[];
-}
-
 export type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
 
-export type ContactFormErrors = Partial<Record<keyof IContactForm, string>>
+export type ContactsFormErrors = Partial<Record<keyof IContactsForm, string>>
 
 // ответ сервера в случае удачного оформления заказа
 interface IOrderResult {
