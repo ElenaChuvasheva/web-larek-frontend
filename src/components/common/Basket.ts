@@ -1,6 +1,6 @@
-import {Component} from "../base/Component";
-import {createElement, ensureElement} from "../../utils/utils";
-import {EventEmitter} from "../base/events";
+import { createElement } from "../../utils/utils";
+import { Component } from "../base/Component";
+import { EventEmitter } from "../base/events";
 
 interface IBasketView {
     items: HTMLElement[];
@@ -15,7 +15,7 @@ export class Basket extends Component<IBasketView> {
     constructor(container: HTMLElement, protected events: EventEmitter) {
         super(container);
 
-        this._list = ensureElement<HTMLElement>('.basket__list');
+        this._list = this.container.querySelector('.basket__list');
         this._total = this.container.querySelector('.basket__price');
         this._button = this.container.querySelector('.basket__button');
         
@@ -26,9 +26,10 @@ export class Basket extends Component<IBasketView> {
         }
 
         this.items = [];
+        this.disableButton(true);
     }
 
-    set items(items: HTMLElement[]) {
+    set items(items: HTMLElement[]) {        
         if (items.length) {
             this._list.replaceChildren(...items);
         } else {
@@ -40,5 +41,9 @@ export class Basket extends Component<IBasketView> {
 
     set total(total: string) {
       this._total.textContent = total;
-  }
+    }
+
+    disableButton(disabled: boolean) {
+        this.setDisabled(this._button, disabled);
+    }
 }

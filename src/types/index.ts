@@ -8,6 +8,10 @@ export interface IItem {
     price: number | null;
 }
 
+export interface ICard extends IItem {
+    index?: number;
+}
+
 // данные заказа для отправки на бэкенд
 export interface IOrder extends IOrderForm,  IContactForm {
     total: number; 
@@ -17,7 +21,7 @@ export interface IOrder extends IOrderForm,  IContactForm {
 // модель состояния приложения
 export interface IAppState {
     catalog: IItem[];
-    basket: Uuid[];
+    basket: IItem[];
     order: IOrder | null;
     orderformErrors: OrderFormErrors;
     contactformErrors: ContactFormErrors;
