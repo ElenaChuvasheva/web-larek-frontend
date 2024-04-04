@@ -1,7 +1,5 @@
-import { ContactsFormErrors, IAppState, IItem, IOrder, OrderFormErrors } from "../types";
+import { ContactsFormErrors, FormName, IAnyForm, IAppState, IItem, IOrder, OrderFormErrors } from "../types";
 import { Model } from "./base/Model";
-import { IAnyForm } from "../types";
-import { IEvents } from "./base/events";
 
 export class Item extends Model<IItem> {
     id: string;
@@ -13,18 +11,18 @@ export class Item extends Model<IItem> {
 }
 
 export class AppState extends Model<IAppState> {
-    catalog: IItem[];
-    basket: IItem[];
-    order: IOrder;
-    orderFormErrors: OrderFormErrors;
-    contactsFormErrors: ContactsFormErrors;
-
-    constructor(data: Partial<IAppState>, protected events: IEvents) {
-        super(data, events);
-        this.catalog = [];
-        this.basket = [];
-        this.cleanOrderState();
-    }
+    catalog: IItem[] = [];
+    basket: IItem[] = [];
+    order: IOrder = {
+        address: '',
+        payment: '',
+        email: '',
+        phone: '',
+        total: 0,
+        items: []
+    };
+    orderFormErrors: OrderFormErrors = {};
+    contactsFormErrors: ContactsFormErrors = {};
 
     setCatalog(items: IItem[]) {                
         this.catalog = items.map(item => new Item(item, this.events));
@@ -65,10 +63,14 @@ export class AppState extends Model<IAppState> {
         }
     }
 
-    validate(formType: 'order' | 'contacts') {
+    validate(formType: FormName) {
         const errors = (formType === 'order') ? this.setOrderErrors() : this.setContactsErrors();
         this.events.emit(formType + 'FormErrors:change', errors);
         return Object.keys(errors).length === 0;
+    }
+
+    getFormFields(formType: FormName) {
+        return (formType === 'order') ? {payment: this.order.payment, address: this.order.address} : {email: this.order.email, phone: this.order.phone}
     }
 
     setOrderErrors() {
@@ -95,17 +97,45 @@ export class AppState extends Model<IAppState> {
         return errors;
     }
 
-    cleanOrderState() {
-        this.order = {
-            address: '',
-            payment: '',
-            email: '',
-            phone: '',
-            total: 0,
-            items: []
-        }
+    cleanOrderItems() {
+        this.order.total = 0;
+        this.order.items = [];
         this.orderFormErrors = {};
         this.contactsFormErrors = {};
+    }
+
+    cleanBasketState() {
+        this.basket = [];
+        this.emitChanges('basket:changed');
+    }
+
+    prepareOrder() {
+        this.order.total = this.getTotalBasket();
+        this.basket.forEach((item) => {
+            if (item.price) {
+                this.order.items.push(item.id);
+            }
+        });
+    }
+
+    getOrderData() {
+        return structuredClone(this.order);
+    }
+
+    getAddress() {
+        return this.order.address;
+    }
+
+    getPayment() {
+        return this.order.payment;
+    }
+
+    getEmail() {
+        return this.order.email;
+    }
+
+    getPhone() {
+        return this.order.phone;
     }
 }
 

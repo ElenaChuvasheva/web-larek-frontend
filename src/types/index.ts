@@ -16,7 +16,7 @@ export interface IAnyForm extends IOrderForm,  IContactsForm {};
 
 // данные заказа для отправки на бэкенд
 export interface IOrder extends IAnyForm {
-    total: number; 
+    total: number;
     items: Uuid[]; 
 } 
 
@@ -59,7 +59,7 @@ export type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>
 export type ContactsFormErrors = Partial<Record<keyof IContactsForm, string>>
 
 // ответ сервера в случае удачного оформления заказа
-interface IOrderResult {
+export interface IOrderResult {
     id: Uuid;
     total: number;
 }
@@ -69,3 +69,5 @@ export type ApiListResponse<Type> = {
     total: number,
     items: Type[]
 }
+
+export type FormName = 'order' | 'contacts';

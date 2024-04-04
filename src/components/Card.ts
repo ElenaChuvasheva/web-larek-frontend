@@ -43,7 +43,6 @@ export class Card extends Component<ICard> {
         this._title.textContent = value;
     }
 
-    // просто заблокировать? если нет, то при пересчёте заказа следить, чтобы не отправить пустой
     set price(value: number | null) {
         this._price.textContent = priceString(value);
     }

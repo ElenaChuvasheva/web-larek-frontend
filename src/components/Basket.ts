@@ -1,6 +1,6 @@
-import { createElement } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { EventEmitter } from "../base/events";
+import { createElement, priceString } from "../utils/utils";
+import { Component } from "./base/Component";
+import { EventEmitter } from "./base/events";
 
 interface IBasketView {
     items: HTMLElement[];
@@ -39,8 +39,8 @@ export class Basket extends Component<IBasketView> {
         }
     }
 
-    set total(total: string) {
-      this._total.textContent = total;
+    set total(total: number) {
+      this._total.textContent = priceString(total);
     }
 
     disableButton(disabled: boolean) {

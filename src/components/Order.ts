@@ -1,6 +1,6 @@
-import {Form} from "./common/Form";
-import {IOrderForm} from "../types";
-import {IEvents} from "./base/events";
+import { IOrderForm } from "../types";
+import { IEvents } from "./base/events";
+import { Form } from "./common/Form";
 
 export class Order extends Form<IOrderForm> {
     protected buttons: HTMLButtonElement[] = [];
@@ -26,8 +26,11 @@ export class Order extends Form<IOrderForm> {
       (this.container.elements.namedItem('address') as HTMLInputElement).value = value;  
     }
 
-    cleanButtons() {
-      this.buttons.forEach(button => button.classList.remove('button_alt-active'));
-      this.address = '';
+    set payment(value: string) {
+      const currentButton = this.buttons.find((button, index, array) => { return button.name === value; });
+      if (currentButton) {
+        currentButton.classList.add('button_alt-active');
+        this.onInputChange('payment', currentButton.name);
+      }
     }
 }

@@ -1,19 +1,19 @@
 import './scss/styles.scss';
 
-import { Form } from './components/common/Form'; 
-import { IOrderForm, IContactsForm, IAnyForm } from './types';
 import { AppState, CatalogChangeEvent } from "./components/AppData";
+import { Basket } from './components/Basket';
 import { Card } from './components/Card';
-import { LarekAPI } from './components/LarekAPI';
-import { Page } from './components/Page';
-import { EventEmitter } from './components/base/events';
-import { Basket } from './components/common/Basket';
-import { Modal } from './components/common/Modal';
-import { IItem } from './types';
-import { API_URL, CDN_URL } from "./utils/constants";
-import { Order } from './components/Order';
-import { cloneTemplate, ensureElement, priceString } from './utils/utils';
 import { Contacts } from './components/Contacts';
+import { LarekAPI } from './components/LarekAPI';
+import { Order } from './components/Order';
+import { Page } from './components/Page';
+import { Success } from './components/Success';
+import { EventEmitter } from './components/base/events';
+import { Form } from './components/common/Form';
+import { Modal } from './components/common/Modal';
+import { FormName, IAnyForm, IContactsForm, IItem, IOrderForm } from './types';
+import { API_URL, CDN_URL } from "./utils/constants";
+import { cloneTemplate, ensureElement } from './utils/utils';
 
 const api = new LarekAPI(CDN_URL, API_URL);
 const events = new EventEmitter();
@@ -27,17 +27,35 @@ const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
 const cardBasketTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
 const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
 const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
+const success = new Success(cloneTemplate(successTemplate), events);
 
 const onFormErrorsChange = (input: {errors: Partial<IAnyForm>, form: Form<IAnyForm>}) => {
-    input.form.valid = Object.values(input.errors).every((text) => {return !text;});    
+    input.form.valid = Object.values(input.errors).every((text) => {return !text;});
     input.form.errors = Object.values(input.errors).filter(i => !!i).join('; ');      
 }
 
+const renderForm = (formName: FormName) => {
+    const formFields = appData.getFormFields(formName);
+    const form = formName === 'order' ? order : contacts;
+    modal.render({
+        content: form.render(
+          {
+            valid: false,
+            errors: [],
+            ...formFields
+          }
+        ),
+      });
+    if (Object.values(formFields).some((data) => { return data;})) {
+        appData.validate(formName);
+    }
+}
 
 events.on<CatalogChangeEvent>('items:changed', () => {
     page.catalog = appData.catalog.map(item => {        
@@ -89,7 +107,7 @@ events.on('basket:changed', () => {
         });
     });
     const totalNumber = appData.getTotalBasket();
-    basket.total = priceString(totalNumber);
+    basket.total = totalNumber;
     basket.disableButton(!Boolean(totalNumber));
 });
 
@@ -106,17 +124,8 @@ events.on('basket:open', () => {
 });
 
 events.on('order:open', () => {
-    order.cleanButtons();
-    appData.cleanOrderState();
-    modal.render({
-      content: order.render(
-        {
-            valid: false,
-            errors: [],
-            address: ''
-        }
-      ),
-    });
+    appData.cleanOrderItems();
+    renderForm('order');
   });
 
 events.on(/^(order|contacts)\..*:change/, (data: { field: keyof IAnyForm, value: string }) => {    
@@ -132,17 +141,30 @@ events.on('contactsFormErrors:change', (errors: Partial<IContactsForm>) => {
   });
 
 events.on('order:submit', ()=> {
-    modal.render({
-        content: contacts.render(
-          {
-            valid: false,
-            errors: [],
-            email: '',
-            phone: ''
-          }
-        ),
-      });    
+    renderForm('contacts');
 });
+
+events.on('contacts:submit', () => {    
+    appData.prepareOrder();
+    api.postOrder(appData.getOrderData())
+    .then(result => {        
+        modal.render({
+            content: success.render({
+                total: appData.getTotalBasket()
+            })
+        });
+        appData.cleanBasketState();
+    })
+    .catch(err => {
+        console.error(err);
+        console.log(appData.getOrderData());
+    })
+    .finally(() => {
+        appData.cleanOrderItems();
+    });
+});
+
+events.on('success:submit', () => modal.close());
 
 api.getItemList()
     .then((result) => {appData.setCatalog(result);})
