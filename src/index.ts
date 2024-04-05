@@ -161,7 +161,6 @@ events.on('contacts:submit', () => {
 		})
 		.catch((err) => {
 			console.error(err);
-			console.log(appData.getOrderData());
 		})
 		.finally(() => {
 			appData.cleanOrder();

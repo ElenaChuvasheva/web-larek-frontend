@@ -28,7 +28,6 @@ export class Order extends Form<IOrderForm> {
 	set address(value: string) {
 		(this.container.elements.namedItem('address') as HTMLInputElement).value =
 			value;
-		console.log('lol');
 	}
 
 	set payment(value: string) {
