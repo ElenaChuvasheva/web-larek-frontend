@@ -1,13 +1,13 @@
+import { ensureElement } from '../../utils/utils';
 import { Component } from '../base/Component';
 import { IEvents } from '../base/events';
-import { ensureElement } from '../../utils/utils';
 
 interface IFormState {
 	valid: boolean;
 	errors: string[];
 }
 
-export class Form<T> extends Component<IFormState> {
+export abstract class Form<T> extends Component<IFormState> {
 	protected _submit: HTMLButtonElement;
 	protected _errors: HTMLElement;
 
@@ -54,4 +54,6 @@ export class Form<T> extends Component<IFormState> {
 		Object.assign(this, inputs);
 		return this.container;
 	}
+
+	abstract cleanFieldValues(): void;
 }

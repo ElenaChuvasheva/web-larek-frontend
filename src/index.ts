@@ -48,22 +48,14 @@ const onFormErrorsChange = (input: {
 };
 
 const renderForm = (formName: FormName) => {
-	const formFields = appData.getFormFields(formName);
 	const form = formName === 'order' ? order : contacts;
+	form.cleanFieldValues();
 	modal.render({
 		content: form.render({
 			valid: false,
 			errors: [],
-			...formFields,
 		}),
 	});
-	if (
-		Object.values(formFields).some((data) => {
-			return data;
-		})
-	) {
-		appData.validate(formName);
-	}
 };
 
 events.on('items:changed', () => {
@@ -132,7 +124,7 @@ events.on('basket:open', () => {
 });
 
 events.on('order:open', () => {
-	appData.cleanOrderItems();
+	appData.cleanOrder();
 	renderForm('order');
 });
 
@@ -172,7 +164,7 @@ events.on('contacts:submit', () => {
 			console.log(appData.getOrderData());
 		})
 		.finally(() => {
-			appData.cleanOrderItems();
+			appData.cleanOrder();
 		});
 });
 

@@ -45,6 +45,9 @@ export class Card extends Component<ICard> {
 
 	set price(value: number | null) {
 		this._price.textContent = priceString(value);
+		if (!value) {
+			this.setDisabled(this._button, true);
+		}
 	}
 
 	set image(value: string) {

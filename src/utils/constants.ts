@@ -8,3 +8,5 @@ export const settings: { [key: string]: string } = {
 	дополнительное: 'additional',
 	кнопка: 'button',
 };
+
+export const ACTIVE_BUTTON_CLASS = 'button_alt-active';

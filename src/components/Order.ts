@@ -1,4 +1,5 @@
 import { IOrderForm } from '../types';
+import { ACTIVE_BUTTON_CLASS } from '../utils/constants';
 import { IEvents } from './base/events';
 import { Form } from './common/Form';
 
@@ -16,9 +17,9 @@ export class Order extends Form<IOrderForm> {
 		this.buttons.forEach((button) => {
 			button.addEventListener('click', () => {
 				this.buttons.forEach((item) =>
-					item.classList.remove('button_alt-active')
+					item.classList.remove(ACTIVE_BUTTON_CLASS)
 				);
-				button.classList.add('button_alt-active');
+				button.classList.add(ACTIVE_BUTTON_CLASS);
 				this.onInputChange('payment', button.name);
 			});
 		});
@@ -27,6 +28,7 @@ export class Order extends Form<IOrderForm> {
 	set address(value: string) {
 		(this.container.elements.namedItem('address') as HTMLInputElement).value =
 			value;
+		console.log('lol');
 	}
 
 	set payment(value: string) {
@@ -34,8 +36,16 @@ export class Order extends Form<IOrderForm> {
 			return button.name === value;
 		});
 		if (currentButton) {
-			currentButton.classList.add('button_alt-active');
+			currentButton.classList.add(ACTIVE_BUTTON_CLASS);
 			this.onInputChange('payment', currentButton.name);
 		}
+	}
+
+	cleanFieldValues() {
+		this.address = '';
+		this.payment = '';
+		this.buttons.forEach((button) =>
+			button.classList.remove(ACTIVE_BUTTON_CLASS)
+		);
 	}
 }

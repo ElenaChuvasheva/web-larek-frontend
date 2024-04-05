@@ -8,6 +8,7 @@ import {
 	OrderFormErrors,
 } from '../types';
 import { Model } from './base/Model';
+import { IEvents } from './base/events';
 
 export class Item extends Model<IItem> {
 	id: string;
@@ -31,6 +32,13 @@ export class AppState extends Model<IAppState> {
 	};
 	orderFormErrors: OrderFormErrors = {};
 	contactsFormErrors: ContactsFormErrors = {};
+
+	constructor(data: Partial<IAppState>, protected events: IEvents) {
+		super(data, events);
+		this.catalog = [];
+		this.basket = [];
+		this.cleanOrder();
+	}
 
 	setCatalog(items: IItem[]) {
 		this.catalog = items.map((item) => new Item(item, this.events));
@@ -59,7 +67,7 @@ export class AppState extends Model<IAppState> {
 
 	getTotalBasket(): number {
 		return this.basket.reduce((a, b) => {
-			return a + (b.price ? b.price : 0);
+			return a + b.price;
 		}, 0);
 	}
 
@@ -80,12 +88,6 @@ export class AppState extends Model<IAppState> {
 			formType === 'order' ? this.setOrderErrors() : this.setContactsErrors();
 		this.events.emit(formType + 'FormErrors:change', errors);
 		return Object.keys(errors).length === 0;
-	}
-
-	getFormFields(formType: FormName) {
-		return formType === 'order'
-			? { payment: this.order.payment, address: this.order.address }
-			: { email: this.order.email, phone: this.order.phone };
 	}
 
 	setOrderErrors() {
@@ -112,9 +114,15 @@ export class AppState extends Model<IAppState> {
 		return errors;
 	}
 
-	cleanOrderItems() {
-		this.order.total = 0;
-		this.order.items = [];
+	cleanOrder() {
+		this.order = {
+			address: '',
+			payment: '',
+			email: '',
+			phone: '',
+			total: 0,
+			items: [],
+		};
 		this.orderFormErrors = {};
 		this.contactsFormErrors = {};
 	}
